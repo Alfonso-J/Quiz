@@ -18,8 +18,15 @@ exports.load = function(req, res, next, quizId){
 
 //GET /quizes
 exports.index = function(req, res){
-  console.log("Entro index");
-  models.Quiz.findAll().then(function(quizes){
+  console.log("Entro index :" + req.query.search);
+  var buscar;
+
+  if (req.query.search!=undefined){
+      buscar = '%' + req.query.search.replace(/[ ]/g,'%') + '%';
+  }else{
+    buscar = '';
+  }
+  models.Quiz.findAll({where:{pregunta:{like:buscar}},order:[['pregunta', 'ASC']]}).then(function(quizes){
     console.log("quizez count " + quizes.length);
     res.render('quizes/index.ejs', {quizes: quizes});
   })
