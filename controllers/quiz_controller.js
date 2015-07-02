@@ -52,3 +52,17 @@ exports.answer = function(req,res){
   })
 
 };
+exports.new = function(req,res){
+  var quiz = models.Quiz.build(
+    {pregunta:"Pregunta",respuesta:"Respuesta"} //Crea objeto quiz
+  );
+  res.render('quizes/new',{quiz: quiz});
+};
+exports.create = function(req, res){
+  var quiz = models.Quiz.build(req.body.quiz);
+  console.log("Entro en create : "+  JSON.stringify(req.body.quiz));
+  //Guarda en BD los campos pregunta y respuesta de quiz
+  quiz.save({fields: ["pregunta", "respuesta"]}).then(function(){
+    res.redirect('/quizes');
+  }) //Redirección HTTP (URL relativo) lista de preguntas
+};
