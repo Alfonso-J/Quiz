@@ -29,7 +29,7 @@ exports.index = function(req, res){
   models.Quiz.findAll({where:{pregunta:{like:buscar}},order:[['pregunta', 'ASC']]}).then(function(quizes){
     console.log("quizez count " + quizes.length);
     res.render('quizes/index.ejs', {quizes: quizes, errors: []});
-  })
+  }).catch(function(error){next(error)});
 };
 
 //GET /quizes/:id
@@ -70,6 +70,30 @@ exports.create = function(req, res){
         quiz.save({fields: ["pregunta", "respuesta"]}).then(function(){
           res.redirect('/quizes');
         }) //Redirección HTTP (URL relativo) lista de preguntas
+      }
+    }
+  );
+};
+exports.edit =function(req,res){
+  console.log("Entro en edit");
+  var quiz = req.quiz;
+
+  res.render('quizes/edit',{quiz: quiz, errors: []});
+};
+
+exports.update = function(req,res){
+  req.quiz.pregunta = req.body.quiz.pregunta;
+  req.quiz.respuesta = req.body.quiz.respuesta;
+  req.quiz
+  .validate()
+  .then(
+    function(err){
+      if (err) {
+        res.render('quizes/edit',{quiz:req.quiz, errors: err.errors});
+      } else {
+        req.quiz
+        .save( {fields: ["pregunta","respuesta"]})
+        .then( function(){ res.redirect('/quizes');});
       }
     }
   );
