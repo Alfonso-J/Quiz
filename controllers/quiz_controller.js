@@ -5,6 +5,7 @@ exports.load = function(req, res, next, quizId){
   models.Quiz.find(quizId).then(
     function(quiz){
       if(quiz){
+        console.log("Entro en load : "+  JSON.stringify(quiz));
         req.quiz = quiz;
         next();
       }else{
@@ -24,7 +25,7 @@ exports.index = function(req, res){
   if (req.query.search!=undefined){
       buscar = '%' + req.query.search.replace(/[ ]/g,'%') + '%';
   }else{
-    buscar = '';
+    buscar = '%';
   }
   models.Quiz.findAll({where:{pregunta:{like:buscar}},order:[['pregunta', 'ASC']]}).then(function(quizes){
     console.log("quizez count " + quizes.length);
@@ -60,14 +61,14 @@ exports.new = function(req,res){
 };
 exports.create = function(req, res){
   var quiz = models.Quiz.build(req.body.quiz);
-  console.log("Entro en create : "+  JSON.stringify(req.body.quiz));
+
   //Guarda en BD los campos pregunta y respuesta de quiz
   quiz.validate().then(
     function(err){
       if (err) {
         res.render('quizes/new',{quiz: quiz, errors: err.errors});
       }else{
-        quiz.save({fields: ["pregunta", "respuesta"]}).then(function(){
+        quiz.save({fields: ["pregunta", "respuesta","tema"]}).then(function(){
           res.redirect('/quizes');
         }) //Redirección HTTP (URL relativo) lista de preguntas
       }
@@ -75,7 +76,7 @@ exports.create = function(req, res){
   );
 };
 exports.edit =function(req,res){
-  console.log("Entro en edit");
+
   var quiz = req.quiz;
 
   res.render('quizes/edit',{quiz: quiz, errors: []});
@@ -84,6 +85,7 @@ exports.edit =function(req,res){
 exports.update = function(req,res){
   req.quiz.pregunta = req.body.quiz.pregunta;
   req.quiz.respuesta = req.body.quiz.respuesta;
+  req.quiz.tema = req.body.quiz.tema;
   req.quiz
   .validate()
   .then(
@@ -92,7 +94,7 @@ exports.update = function(req,res){
         res.render('quizes/edit',{quiz:req.quiz, errors: err.errors});
       } else {
         req.quiz
-        .save( {fields: ["pregunta","respuesta"]})
+        .save( {fields: ["pregunta","respuesta","tema"]})
         .then( function(){ res.redirect('/quizes');});
       }
     }
