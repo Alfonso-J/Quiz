@@ -5,7 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var partials = require('express-partials');
-var methodOverride = require('method-override')
+var methodOverride = require('method-override');
+var session = require('express-session');
+
 
 var routes = require('./routes/index');
 
@@ -24,9 +26,20 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
+app.use(cookieParser('Quiz 2015'));
+app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+//Helpers dinamicos:
+app.use(function(req,res,next){
+  //guardar path en session .redir para despues de login
+  if(!req.path.match(/\/login|\/logout/)){
+    req.session.redir = req.path;
+  }
+  //hacer visible req.session en las vistas
+  res.locals.session = req.session;
+  next();
+});
 
 
 
