@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var partials = require('express-partials');
 var methodOverride = require('method-override');
 var session = require('express-session');
+var sessionController = require('./controllers/session_controller');
 
 
 var routes = require('./routes/index');
@@ -42,6 +43,7 @@ app.use(function(req,res,next){
 });
 
 
+app.use('/',sessionController.autoLogout);
 
 app.use('/', routes);
 
